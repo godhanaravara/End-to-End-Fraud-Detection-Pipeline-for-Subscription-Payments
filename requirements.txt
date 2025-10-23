@@ -1,0 +1,11 @@
+pyspark
+pandas
+pyarrow
+lightgbm
+scikit-learn
+typer
+pydantic>=2
+SQLAlchemy
+duckdb
+python-dotenv
+apache-airflow

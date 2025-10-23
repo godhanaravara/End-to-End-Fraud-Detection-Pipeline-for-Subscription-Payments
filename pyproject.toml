@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fraudflow"
+version = "0.1.0"
+description = "Local PySpark + Airflow fraud detection pipeline for subscription payments"
+authors = [{name="Your Name"}]
+requires-python = ">=3.10"
+dependencies = [
+  "pyspark",
+  "pandas",
+  "pyarrow",
+  "lightgbm",
+  "scikit-learn",
+  "typer",
+  "pydantic>=2",
+  "SQLAlchemy",
+  "duckdb",       
+  "python-dotenv",
+]
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100
+select = ["E","F","I","UP","B","Q","TID","ANN"]
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+strict = true
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]

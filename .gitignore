@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+.venv-*/
+.env
+*.egg-info/
+
+# Airflow noise
+airflow.db
+airflow.cfg
+logs/
+*/logs/
+
+# Data & artifacts (keep repo lightweight)
+data/
+artifacts/
+reports/
+examples/*.parquet
+*.parquet
+*.csv
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+cat >> .gitignore <<'EOF'
+
+# Jupyter
+.ipynb_checkpoints/
+**/.ipynb_checkpoints/
+*-checkpoint.ipynb
+*-checkpoint.py
+EOF
+
+# Airflow home (local only)
+airflow_home/
