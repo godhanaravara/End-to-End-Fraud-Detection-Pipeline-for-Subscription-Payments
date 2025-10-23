@@ -1,11 +1,12 @@
 # End-to-End Fraud Detection Pipeline for Subscription Payments
-## Machine Learning for Subscription-Payment Fraud Detection (Local Spark + Airflow)
-<img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=FF0000&width=150&lines=In+Progress!" height="35" alt="In Progress" />
+*Machine Learning for Subscription-Payment Fraud Detection (Local Spark + Airflow)*
 
 ## ▸ Problem Statement
 Subscription (recurring) payments create a steady attack surface for fraud: repeated micro-transactions, balance games, and subtle behaviors that blend into normal churn. Manual review doesn’t scale past a few thousand rows.
 
-This project delivers a fully local, end-to-end pipeline using PySpark + LightGBM + Airflow, that ingests ~6.3M transactions, engineers subscription-aware features, trains a classifier, and scores daily batches so risk teams can triage the top 0.5–1% highest-risk payments first.
+This pipeline delivers a fully local, end-to-end solution using PySpark + LightGBM + Airflow, which ingests ~6.3M transactions, engineers subscription-aware features, trains a classifier, and scores daily batches so risk teams can triage the top 0.5–1% highest-risk payments first.
+
+✦ This project showcases my expertise in **data engineering** (PySpark, Airflow, Parquet), **ML for fraud** (LightGBM, class-imbalance handling), and **analysis at rest** (DuckDB/SQLite) - all runnable locally.
 
 ---
 ## ▸ Data Sources & Collection
@@ -19,18 +20,22 @@ This project delivers a fully local, end-to-end pipeline using PySpark + LightGB
 ---
 ## ▸ ML Pipeline Overview
 
+```mermaid
 flowchart LR
-  A[Raw CSV (Kaggle 6.3M)] -->|Spark Read| B[Bronze Parquet]
-  B -->|Clean + Type Cast + Sanity Flags| C[Silver Parquet]
-  C -->|Feature Engineering| F[Feature Table]
-  F -->|Train (LightGBM)| M[(Model)]
-  M -->|@daily| G[Gold: scores.parquet]
-  G -->|DuckDB / SparkSQL| R[Analysis & HTML Report]
+  A[Raw] -->|Spark read| B[Bronze]
+  B -->|Clean| C[Silver]
+  C -->|Feature engineering| F[Features]
+  F -->|Train| M[(Model)]
+  M -->|Batch score| G[Gold]
+  G -->|DuckDB| R[Report]
 
-  subgraph Airflow DAG (@daily)
-    X1[extract_transform_train] --> X2[score] --> X3[publish]
+  %% subgraph name must be simple (no spaces, quotes, or @)
+  subgraph Airflow_DAG_daily
+    X1[extract] --> X2[score] --> X3[publish]
   end
 
+
+```
 
 Feature snapshots (initial):
 `step`, `amount`, `oldbalanceOrg`, `newbalanceOrig`, `delta_bal`, `type_* (ohe)`, `is_weekend`, `hour_of_day`, simple rolling stats (7–30d) where feasible; class imbalance handled by scale_pos_weight.
@@ -101,7 +106,7 @@ airflow dags trigger fraudflow_local
 - **Chargeback reduction**: Surface the worst 0.5–1% of transactions for human review before settlement, lowering refund/chargeback costs.
 - **Analyst efficiency**: Route analysts to high-precision queues first, reduce manual review volume by **~99.5%** while catching **~97%** of fraud at the **0.5%** setting.
 - **Faster interdiction**: Shorter time-to-flag = fewer repeat fraud attempts on the same instrument/subscription.
-- **Cash-flow protection**: arly detection prevents repeated “balance games” across cycles.
+- **Cash-flow protection**: Early detection prevents repeated “balance games” across cycles.
 - **Auditability & reproducibility**: Parquet + SQL outputs and HTML reports provide transparent, repeatable evidence for policy tuning.
 
 ---
@@ -114,26 +119,36 @@ airflow dags trigger fraudflow_local
 ✦ **Operating point**: start with **Top 0.5%** review rate; adjust to analyst capacity.
 
 ---
-## ▸ Skills & Tools
+ ## ▸ Skills & Tools
 
-- ![Databricks](https://img.shields.io/badge/Databricks-EC6B24?style=for-the-badge&logo=databricks&logoColor=white):
-  - Orchestrated @daily extract→transform→train→score over 6.3M rows with distributed compute.
-- ![PySpark](https://img.shields.io/badge/PySpark-FF5722?style=for-the-badge&logo=apachespark&logoColor=white):
-  - Schema-enforced I/O, feature engineering, and Bronze/Silver/Gold Parquet layers.
-  - Gradient-boosted tree classifier with class imbalance handling (scale_pos_weight).
-  - Fast local SQL over Parquet for validation and demo queries.
-- ![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white) + ![pandas](https://img.shields.io/badge/pandas-150458?style=for-the-badge&logo=pandas&logoColor=white):
-  - Tabular utilities & metrics.
-  - Vectorized columnar memory & Parquet interoperability.
-- ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white):
-  - config, structured logging, and a clean CLI.
-  - Lint/test CI (ruff, black, pytest).
-  - KPI publishing to SQLite for lightweight dashboards.
+- ![Apache Airflow](https://img.shields.io/badge/Apache_Airflow-017CEE?style=for-the-badge&logo=apacheairflow&logoColor=white)
+  Orchestrates @daily **extract → transform → train → score → publish**.
+- ![Apache Spark](https://img.shields.io/badge/Apache_Spark-E25A1C?style=for-the-badge&logo=apachespark&logoColor=white)
+  Distributed I/O, feature engineering, and Parquet Bronze/Silver/Gold layers.
+- ![LightGBM](https://img.shields.io/badge/LightGBM-5B9BD5?style=for-the-badge)
+  Gradient-boosted trees with `scale_pos_weight` for heavy imbalance.
+- ![DuckDB](https://img.shields.io/badge/DuckDB-FFF000?style=for-the-badge&logo=duckdb&logoColor=black) + ![SQLite](https://img.shields.io/badge/SQLite-003B57?style=for-the-badge&logo=sqlite&logoColor=white)
+  Fast local analytics on Parquet and lightweight KPI store.
+- ![PyArrow](https://img.shields.io/badge/Apache_Arrow-0E7FBF?style=for-the-badge&logo=apachearrow&logoColor=white)
+  Zero-copy columnar interchange; Parquet read/write.
+- ![scikit-learn](https://img.shields.io/badge/scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white)
+  Metrics (ROC/PR, precision/recall@k) and utilities.
+- ![Typer](https://img.shields.io/badge/Typer-1F6FEB?style=for-the-badge)
+  Clean CLI: `fraudflow.cli run-all`, `score`, `report`.
+- ![Pydantic](https://img.shields.io/badge/Pydantic-FF4A4A?style=for-the-badge)
+  Typed settings/config for paths & knobs.
+- ![Jupyter](https://img.shields.io/badge/Jupyter-F37626?style=for-the-badge&logo=jupyter&logoColor=white)
+  One notebook (`notebooks/01_browse_scores.ipynb`) for quick exploration.
+- ![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+  (Optional) CI for lint/format/tests.
+- ![Linux](https://img.shields.io/badge/Linux-000000?style=for-the-badge&logo=linux&logoColor=white) ![Make](https://img.shields.io/badge/Make-6E4C13?style=for-the-badge)
+  Convenience targets to run Spark and Airflow locally.
+
 
 ---
 ## ▸ Repo Layout
 
-fraudflow-local
+fraudflow-local  
 ├── src/fraudflow/   -  Spark session, IO, schemas, features, model, eval, pipeline, CLI  
 ├── dags/  -  Airflow DAG (fraudflow_local)  
 ├── data/   -  bronze/ silver/ gold (gitignored)  
@@ -148,7 +163,7 @@ fraudflow-local
 
 
 ## ▸ Future Work
-- Add device/geo/velocity signals, calibrate thresholds and probability calibration.
+- Add device/geo/velocity signals, calibrate thresholds, and probability calibration.
 - Model registry + experiment tracking, and streaming (Kafka) for near-real-time scoring.
 - Hardening: drift checks, feature store, canary runs, and alerting.
 
